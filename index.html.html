@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#d4456a" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
+    <meta name="description" content="Мария Вербицкая — игропрактик и психолог. Т-игры, кинокнижный клуб, консультации по балансу и самоценности.">
+    <title>Мария Вербицкая — Игропрактик и психолог</title>
+    <style>
+        /* === БАЗОВЫЕ НАСТРОЙКИ И СБРОС === */
+        :root {
+            --primary: #d4456a;
+            --primary-hover: #c23a5d;
+            --bg: #fafafa;
+            --text: #2c2c2c;
+            --card-bg: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.95);
+            --shadow: rgba(0,0,0,0.06);
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #121212;
+                --text: #e0e0e0;
+                --card-bg: #1e1e1e;
+                --header-bg: rgba(18, 18, 18, 0.95);
+                --shadow: rgba(0,0,0,0.3);
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* === АНИМАЦИИ === */
+        .fade-in, .fade-in-left, .fade-in-right, .scale-in {
+            opacity: 0;
+            transition: opacity 0.7s ease, transform 0.7s ease;
+            will-change: opacity, transform;
+        }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+        .fade-in { transform: translateY(20px); }
+        
+        .fade-in-left.visible { opacity: 1; transform: translateX(0); }
+        .fade-in-left { transform: translateX(-30px); }
+        
+        .fade-in-right.visible { opacity: 1; transform: translateX(0); }
+        .fade-in-right { transform: translateX(30px); }
+        
+        .scale-in.visible { opacity: 1; transform: scale(1); }
+        .scale-in { transform: scale(0.9); }
+
+        /* === HEADER === */
+        header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: calc(15px + var(--safe-top)) 30px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 2px 20px var(--shadow);
+        }
+
+        .logo { font-size: clamp(1rem, 4vw, 1.3rem); font-weight: 700; color: var(--primary); }
+        
+        .menu-btn {
+            background: none; border: none; font-size: 1.8rem; cursor: pointer;
+            color: var(--text); padding: 8px; touch-action: manipulation;
+        }
+
+        /* === DRAWER & OVERLAY === */
+        .overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            opacity: 0; visibility: hidden; transition: all 0.4s; z-index: 150;
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        .drawer {
+            position: fixed; top: 0; right: -100%; width: 300px; max-width: 85%;
+            height: 100vh; height: 100dvh; background: var(--card-bg);
+            z-index: 200; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: calc(30px + var(--safe-top)) 30px calc(30px + var(--safe-bottom));
+            display: flex; flex-direction: column; box-shadow: -5px 0 30px var(--shadow);
+        }
+        .drawer.active { right: 0; }
+
+        .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .drawer-title { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+        .close-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--text); }
+
+        .drawer nav a {
+            display: block; padding: 15px 0; color: var(--text); text-decoration: none;
+            font-size: 1.1rem; border-bottom: 1px solid var(--shadow); transition: color 0.3s;
+        }
+        .drawer nav a:hover, .drawer nav a:active { color: var(--primary); }
+
+        /* === HERO SECTION === */
+        .hero {
+            min-height: 100vh; min-height: 100dvh; display: flex; align-items: center;
+            padding: calc(100px + var(--safe-top)) 30px 60px;
+            background: linear-gradient(135deg, #fdf2f5 0%, #fff 50%, #f5f0ff 100%);
+            position: relative; overflow: hidden;
+        }
+        @media (prefers-color-scheme: dark) {
+            .hero { background: linear-gradient(135deg, #1a0f14 0%, #121212 50%, #15101a 100%); }
+        }
+
+        .hero::before {
+            content: ''; position: absolute; top: -50%; right: -20%;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(212,69,106,0.08) 0%, transparent 70%);
+            border-radius: 50%; pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px; margin: 0 auto; display: grid;
+            grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; width: 100%;
+            position: relative; z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem); font-weight: 400;
+            color: #888; margin-bottom: 10px; letter-spacing: 2px; text-transform: uppercase;
+        }
+        .hero-text h2 {
+            font-size: clamp(2rem, 6vw, 3rem); color: var(--text);
+            margin-bottom: 25px; line-height: 1.2;
+        }
+        .hero-text h2 span { color: var(--primary); }
+        .hero-text p {
+            font-size: clamp(1rem, 2.5vw, 1.1rem); color: #555;
+            margin-bottom: 30px; line-height: 1.7;
+        }
+        @media (prefers-color-scheme: dark) { .hero-text p { color: #bbb; } }
+
+        .hero-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
+        .tag {
+            background: var(--card-bg); padding: 8px 16px; border-radius: 20px;
+            font-size: clamp(0.8rem, 2vw, 0.9rem); color: var(--primary);
+            box-shadow: 0 2px 10px rgba(212,69,106,0.1); border: 1px solid rgba(212,69,106,0.2);
+        }
+
+        .cta-button {
+            display: inline-block; background: var(--primary); color: white;
+            padding: 14px 32px; border-radius: 30px; text-decoration: none;
+            font-weight: 600; font-size: clamp(0.95rem, 2.5vw, 1rem); border: none;
+            cursor: pointer; transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 20px rgba(212,69,106,0.3); touch-action: manipulation;
+        }
+        .cta-button:hover, .cta-button:active {
+            transform: translateY(-3px); background: var(--primary-hover);
+            box-shadow: 0 10px 30px rgba(212,69,106,0.4);
+        }
+
+        /* === HERO IMAGE === */
+        .hero-image { display: flex; justify-content: center; }
+        .hero-image-wrapper {
+            position: relative; width: 100%; max-width: 450px; aspect-ratio: 4/5;
+            border-radius: 30px; overflow: hidden;
+            box-shadow: 0 20px 60px rgba(212,69,106,0.2); contain: layout style paint;
+        }
+        .hero-image-wrapper::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(212,69,106,0.1), transparent);
+            z-index: 1; pointer-events: none;
+        }
+        .hero-image-wrapper img {
+            width: 100%; height: 100%; object-fit: cover; object-position: center top;
+            display: block;
+        }
+
+        /* === SECTIONS & CARDS === */
+        section { padding: 80px 30px; }
+        .section-container { max-width: 1200px; margin: 0 auto; }
+        
+        .section-title {
+            font-size: clamp(1.8rem, 5vw, 2.2rem); margin-bottom: 40px;
+            color: var(--text); text-align: center;
+        }
+        .section-title span { color: var(--primary); }
+
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        
+        .card {
+            background: var(--card-bg); border-radius: 20px; overflow: hidden;
+            box-shadow: 0 10px 40px var(--shadow); transition: transform 0.4s, box-shadow 0.4s;
+            will-change: transform;
+        }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(212,69,106,0.15); }
+
+        .card.text-only { display: flex; flex-direction: column; justify-content: center; min-height: 280px; }
+        .card.text-only .card-content { padding: 40px 30px; text-align: center; }
+        
+        .card-content h3 { font-size: clamp(1.2rem, 3vw, 1.4rem); margin-bottom: 12px; color: var(--text); }
+        .card-content p { color: #666; line-height: 1.6; font-size: clamp(0.95rem, 2.5vw, 1rem); }
+        @media (prefers-color-scheme: dark) { .card-content p { color: #aaa; } }
+
+        /* === SERVICES === */
+        .services {
+            background: linear-gradient(135deg, #f5f0ff 0%, #fdf2f5 100%); text-align: center;
+        }
+        @media (prefers-color-scheme: dark) {
+            .services { background: linear-gradient(135deg, #15101a 0%, #1a0f14 100%); }
+        }
+        .services-box {
+            background: var(--card-bg); padding: clamp(30px, 5vw, 50px) 30px;
+            border-radius: 20px; max-width: 600px; margin: 0 auto;
+            box-shadow: 0 10px 40px var(--shadow);
+        }
+        .services-box p { color: #666; font-size: clamp(1rem, 2.5vw, 1.1rem); }
+        @media (prefers-color-scheme: dark) { .services-box p { color: #aaa; } }
+
+        /* === MODAL === */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center; z-index: 300;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease;
+            padding: 20px; padding-top: calc(20px + var(--safe-top));
+            padding-bottom: calc(20px + var(--safe-bottom));
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+
+        .modal {
+            background: var(--card-bg); border-radius: 25px; padding: 40px;
+            max-width: 500px; width: 100%; max-height: calc(100vh - 40px);
+            max-height: calc(100dvh - 40px); overflow-y: auto; position: relative;
+            transform: scale(0.8) translateY(30px);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+        }
+        .modal-overlay.active .modal { transform: scale(1) translateY(0); }
+
+        .modal-close {
+            position: absolute; top: 20px; right: 20px; background: #f5f5f5;
+            border: none; width: 36px; height: 36px; border-radius: 50%;
+            font-size: 1.2rem; cursor: pointer; color: var(--text);
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.3s; touch-action: manipulation;
+        }
+        .modal-close:hover, .modal-close:active { background: var(--primary); color: white; }
+
+        .modal h2 { font-size: clamp(1.5rem, 5vw, 1.8rem); margin-bottom: 10px; color: var(--text); }
+        .modal h2 span { color: var(--primary); }
+        .modal-subtitle { color: #888; margin-bottom: 30px; font-size: 0.95rem; }
+
+        .contacts-list { display: flex; flex-direction: column; gap: 12px; }
+        .contact-link {
+            display: flex; align-items: center; gap: 15px; padding: 16px 20px;
+            background: var(--bg); border-radius: 15px; text-decoration: none;
+            color: var(--text); transition: all 0.3s; border: 1px solid transparent;
+            touch-action: manipulation;
+        }
+        .contact-link:hover, .contact-link:active {
+            background: #fdf2f5; border-color: rgba(212,69,106,0.3); transform: translateX(5px);
+        }
+        @media (prefers-color-scheme: dark) {
+            .contact-link { background: #2a2a2a; }
+            .contact-link:hover, .contact-link:active { background: #1a0f14; }
+        }
+
+        .contact-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), #e86a8a);
+            color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .contact-icon svg { width: 22px; height: 22px; fill: white; }
+        .contact-info { flex: 1; min-width: 0; }
+        .contact-label { font-size: 0.85rem; color: #888; margin-bottom: 2px; }
+        .contact-value { font-weight: 600; font-size: clamp(0.9rem, 2.5vw, 1rem); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        footer {
+            background: #1a1a1a; color: rgba(255,255,255,0.6); text-align: center;
+            padding: 25px 30px calc(25px + var(--safe-bottom)); font-size: 0.9rem;
+        }
+
+        /* === MEDIA QUERIES === */
+        @media (max-width: 768px) {
+            .hero-container { grid-template-columns: 1fr; gap: 40px; }
+            .hero-image { order: -1; }
+            .hero-image-wrapper { max-width: 320px; }
+            .hero-text { text-align: center; }
+            .hero-tags { justify-content: center; }
+            section { padding: 60px 20px; }
+        }
+
+        @media (max-width: 428px) {
+            header { padding-left: 16px; padding-right: 16px; }
+            .hero { padding-left: 16px; padding-right: 16px; }
+            section { padding: 50px 16px; }
+        }
+
+        @media (min-width: 1440px) {
+            .hero-container, .section-container { max-width: 1400px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Мария Вербицкая</div>
+        <button class="menu-btn" onclick="toggleMenu()" aria-label="Открыть меню">☰</button>
+    </header>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="drawer" id="drawer" role="navigation" aria-label="Главное меню">
+        <div class="drawer-header">
+            <div class="drawer-title">Меню</div>
+            <button class="close-btn" onclick="toggleMenu()" aria-label="Закрыть меню">✕</button>
+        </div>
+        <nav>
+            <a href="#home" onclick="toggleMenu()">Главная</a>
+            <a href="#services" onclick="toggleMenu()">Услуги</a>
+            <a onclick="openContacts(); toggleMenu();">Контакты</a>
+        </nav>
+    </div>
+
+    <section class="hero" id="home">
+        <div class="hero-container">
+            <div class="hero-text">
+                <h1 class="fade-in-left">Привет! Меня зовут</h1>
+                <h2 class="fade-in-left" style="transition-delay: 0.1s;">Мария <span>Вербицкая</span></h2>
+                <p class="fade-in-left" style="transition-delay: 0.2s;">Занимаюсь игропрактикой, веду Т-игры — про доход, продвижение в соцсетях, баланс в жизни и самоценность. У меня есть свой кинокнижный клуб: читаю книги, смотрим и обсуждаем их. Сейчас учусь на психолога.</p>
+                <div class="hero-tags fade-in-left" style="transition-delay: 0.3s;">
+                    <span class="tag">Про доход</span>
+                    <span class="tag">Продвижение в соцсетях</span>
+                    <span class="tag">Баланс в жизни</span>
+                    <span class="tag">Самоценность</span>
+                    <span class="tag">Кинокнижный клуб</span>
+                </div>
+                <button class="cta-button fade-in-left" style="transition-delay: 0.4s;" onclick="openContacts()">Связаться со мной</button>
+            </div>
+            <div class="hero-image fade-in-right">
+                <div class="hero-image-wrapper">
+                    <!-- ⚠️ ЗАМЕНИТЕ photo.jpg НА ПУТЬ К ВАШЕМУ ФОТО -->
+                    <img src="photo.jpg" alt="Мария Вербицкая" loading="eager" fetchpriority="high">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-container">
+            <h2 class="section-title fade-in">Обо <span>мне</span></h2>
+            <div class="cards">
+                <div class="card text-only scale-in">
+                    <div class="card-content">
+                        <h3>Кинокнижный клуб</h3>
+                        <p>Обожаю книги и кино. Веду свой кинокнижный клуб: читаем книги, смотрим экранизации и обсуждаем их вместе.</p>
+                    </div>
+                </div>
+                <div class="card text-only scale-in" style="transition-delay: 0.15s;">
+                    <div class="card-content">
+                        <h3>Путь в психологию</h3>
+                        <p>Учусь на психолога, постоянно развиваюсь и углубляюсь в тему, чтобы помогать людям ещё лучше.</p>
+                    </div>
+                </div>
+                <div class="card text-only scale-in" style="transition-delay: 0.3s;">
+                    <div class="card-content">
+                        <h3>Баланс в жизни</h3>
+                        <p>Верю, что внутренний баланс — основа всего. Помогаю находить опору и гармонию в повседневных вещах.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="services" id="services">
+        <div class="section-container">
+            <h2 class="section-title fade-in">Услуги</h2>
+            <div class="services-box scale-in">
+                <p>Раздел «Услуги» пока в разработке — скоро здесь появится описание услуг.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        © 2026 · пробная версия
+    </footer>
+
+    <div class="modal-overlay" id="contactsModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeContacts()" aria-label="Закрыть">✕</button>
+            <h2>Свяжитесь <span>со мной</span></h2>
+            <p class="modal-subtitle">Выберите удобный способ связи</p>
+            <div class="contacts-list">
+                <a href="https://t.me/mariyaverbitskaya" class="contact-link" target="_blank" rel="noopener">
+                    <div class="contact-icon">
+                        <svg viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+                    </div>
+                    <div class="contact-info">
+                        <div class="contact-label">Telegram</div>
+                        <div class="contact-value">@mariyaverbitskaya</div>
+                    </div>
+                </a>
+                <a href="tel:+79831746585" class="contact-link">
+                    <div class="contact-icon">
+                        <svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
+                    </div>
+                    <div class="contact-info">
+                        <div class="contact-label">MAX (телефон)</div>
+                        <div class="contact-value">+7 983 174 65 85</div>
+                    </div>
+                </a>
+                <a href="https://instagram.com/mariya_verbitskaya" class="contact-link" target="_blank" rel="noopener">
+                    <div class="contact-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                    </div>
+                    <div class="contact-info">
+                        <div class="contact-label">Instagram</div>
+                        <div class="contact-value">mariya_verbitskaya</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('drawer').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+            document.body.style.overflow = document.getElementById('drawer').classList.contains('active') ? 'hidden' : '';
+        }
+
+        function openContacts() {
+            document.getElementById('contactsModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeContacts() {
+            document.getElementById('contactsModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('contactsModal').addEventListener('click', e => {
+            if (e.target === e.currentTarget) closeContacts();
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                closeContacts();
+                if (document.getElementById('drawer').classList.contains('active')) toggleMenu();
+            }
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right, .scale-in').forEach(el => observer.observe(el));
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelectorAll('.hero .fade-in-left, .hero .fade-in-right').forEach(el => el.classList.add('visible'));
+            }, 100);
+        });
+    </script>
+</body>
+</html>
